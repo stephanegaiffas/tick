@@ -6,6 +6,7 @@
 Node::Node(Tree &tree) : samples(), tree(tree) {
   std::cout << "Node::Node(Tree &tree)\n";
   features_min = ArrayDouble(tree.get_forest().get_n_features());
+
   features_max = ArrayDouble(tree.get_forest().get_n_features());
   // At its creation, a node is a leaf
   is_leaf = true;
@@ -16,6 +17,10 @@ Node::Node(Tree &tree) : samples(), tree(tree) {
   // Initialized to one since it will receive multiplicative updates
   aggregation_weight = 1;
   aggregation_weight_ctw = 1;
+
+  KLOG(INF) << this;
+  KLOG(INF) << &features_min;
+  KLOG(INF) << features_min.data();
 }
 
 void Node::update(ulong sample_index, bool update_range) {
@@ -109,9 +114,15 @@ void Node::split(ulong node_index, uint32_t n_splits) {
 
   std::cout << "get_tree().get_node(left_child).features_min.print()= "  << std::endl;
 
+  KLOG(INF) << "this: " << this;
+  KLOG(INF) << "features_min.data(): " << features_min.data();
+
   get_tree().get_node(left_child).get_features_min().print();
 
-  get_tree().get_node(left_child).set_features_min(features_min);
+  get_tree()
+    .get_node(left_child)
+      .set_features_min(features_min);
+
   get_tree().get_node(left_child).set_features_max(features_max);
   get_tree().get_node(right_child).set_features_min(features_min);
   get_tree().get_node(right_child).set_features_max(features_max);

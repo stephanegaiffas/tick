@@ -243,6 +243,12 @@ AbstractArray1d2d<T> &AbstractArray1d2d<T>::operator=(const AbstractArray1d2d<T>
         _size_sparse = other._size_sparse;
         if (other.is_dense()) {
             TICK_PYTHON_MALLOC(_data, T, _size);
+
+            std::cout << "_data       " << _data << std::endl;
+            std::cout << "other._data " << other._data << std::endl;
+            std::cout << "_size       " << _size << std::endl;
+            std::cout << "sizeof(T)   " << sizeof(T) << std::endl;
+
             memcpy(_data, other._data, sizeof(T) * _size);
             _indices = nullptr;
         } else {

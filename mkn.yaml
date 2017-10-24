@@ -53,6 +53,9 @@ profile:
       nix_lib: ${nix_largs}
       bsd_lib: ${bsd_largs}
       win: -nodefaultlib:libucrt.lib ucrt.lib -MANIFEST:EMBED,ID=2 -MANIFESTUAC:NO -LTCG 
+    dep:
+      - name: mkn.kul
+        version: master
 
   - name: base
     parent: arg
@@ -88,7 +91,7 @@ profile:
 
   - name: inference
     parent: arg
-    self: optim/model
+    self: optim/model random
     inc: ./tick/inference/src
     src:
       ./tick/inference/src

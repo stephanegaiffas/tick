@@ -7,6 +7,8 @@
 #include <iomanip>
 #include "../../random/src/rand.h"
 
+#include "kul/log.hpp"
+
 // Forward declaration of a Tree
 class Tree;
 
@@ -51,7 +53,53 @@ class Node {
   Node(Tree &tree, uint32_t parent, ulong creation_time) : Node(tree) {
     this->parent = parent;
     this->creation_time = creation_time;
+    KLOG(INF) << this;
+    KLOG(INF) << features_min.data();
   }
+
+  Node(const Node& o) : Node(o.tree){
+    
+    features_min = o.features_min;
+    features_max = o.features_max;
+
+    KLOG(INF) << "this: " << this;
+    KLOG(INF) << "other: " << &o;
+    KLOG(INF) << features_min.data();
+  }
+
+  Node(Node&& o)  : Node(o.tree){
+    features_min = o.features_min;
+    features_max = o.features_max;
+
+    KLOG(INF) << "this: " << this;
+    KLOG(INF) << "other: " << &o;
+    KLOG(INF) << features_min.data();
+  }
+
+  Node& operator=(const Node& o)
+  {
+    if (&o != this) {
+      features_min = o.features_min;
+      features_max = o.features_max;
+    }
+    KLOG(INF) << "this: " << this;
+    KLOG(INF) << "other: " << &o;
+    KLOG(INF) << features_min.data();
+    return *this;
+  }
+
+  Node& operator=(Node&& o)
+  {
+    if (&o != this) {
+      features_min = o.features_min;
+      features_max = o.features_max;      
+    }
+    KLOG(INF) << "this: " << this;
+    KLOG(INF) << "other: " << &o;
+    KLOG(INF) << features_min.data();
+    return *this;
+  }
+
 
   ~Node() {
     std::cout << "~Node()\n";
@@ -109,12 +157,15 @@ class Node {
     return features_max;
   }
 
-  inline void set_features_min(const ArrayDouble &features_min) {
-    this->features_min = features_min;
+  inline void set_features_min(const ArrayDouble &min) {
+
+    KLOG(INF) << min.data();
+
+    this->features_min = min;
   }
 
-  inline void set_features_max(const ArrayDouble &features_max) {
-    this->features_max = features_max;
+  inline void set_features_max(const ArrayDouble &max) {
+    this->features_max = max;
   }
 
   inline const bool get_is_leaf() const {
