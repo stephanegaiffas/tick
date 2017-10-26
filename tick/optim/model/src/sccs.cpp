@@ -57,8 +57,34 @@ double ModelSCCS::loss_i(const ulong i, const ArrayDouble &coeffs) {
   ArrayDouble inner_prod(n_intervals), softmax(n_intervals);
   ulong max_interval = get_max_interval(i);
 
-  for (ulong t = 0; t < max_interval; t++)
-    inner_prod[t] = get_inner_prod(i, t, coeffs);
+  auto dense_batch = [=]() mutable -> bool {
+    if(coeffs.is_dense()){
+      std::vector<BaseArrayDouble> barrays;
+      for (ulong t = 0; t < max_interval; t++){
+        BaseArrayDouble barray = get_longitudinal_features(i, t);
+        if(barray.is_sparse()) return 0;
+        barrays.emplace_back(barray);        
+      }
+      std::vector<double*> barraysVP;
+      for(const auto& barray : barrays) {
+        barraysVP.emplace_back(barray.data());
+      }
+      auto results = tick::vector_operations<double>{}
+        .batch_dot(barrays.size(), coeffs.size(), coeffs.data(), barraysVP.data());
+      for (ulong t = 0; t < max_interval; t++) {
+        inner_prod[t] = results[t];
+      }
+      return 1;
+    }
+    return 0;
+  };
+
+  if(!dense_batch()) {
+    for (ulong t = 0; t < max_interval; t++) {
+      inner_prod[t] = get_inner_prod(i, t, coeffs);
+    }
+  }
+
   for (ulong t = max_interval; t < n_intervals; t++)
     inner_prod[t] = 0;
 
@@ -93,8 +119,33 @@ void ModelSCCS::grad_i(const ulong i,
   buffer.init_to_zero();
   ulong max_interval = get_max_interval(i);
 
-  for (ulong t = 0; t < max_interval; t++)
-    inner_prod[t] = get_inner_prod(i, t, coeffs);
+  auto dense_batch = [=]() mutable -> bool {
+    if(coeffs.is_dense()){
+      std::vector<BaseArrayDouble> barrays;
+      for (ulong t = 0; t < max_interval; t++){
+        BaseArrayDouble barray = get_longitudinal_features(i, t);
+        if(barray.is_sparse()) return 0;
+        barrays.emplace_back(barray);        
+      }
+      std::vector<double*> barraysVP;
+      for(const auto& barray : barrays) {
+        barraysVP.emplace_back(barray.data());
+      }
+      auto results = tick::vector_operations<double>{}
+        .batch_dot(barrays.size(), coeffs.size(), coeffs.data(), barraysVP.data());
+      for (ulong t = 0; t < max_interval; t++) {
+        inner_prod[t] = results[t];
+      }
+      return 1;
+    }
+    return 0;
+  };
+
+  if(!dense_batch()) {
+    for (ulong t = 0; t < max_interval; t++) {
+      inner_prod[t] = get_inner_prod(i, t, coeffs);
+    }
+  }
 
   if (max_interval < n_intervals)
     view(inner_prod, max_interval, n_intervals).fill(0);  // TODO

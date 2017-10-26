@@ -39,28 +39,62 @@ void SGD::solve_sparse() {
     ulong n_features = model->get_n_features();
     bool use_intercept = model->use_intercept();
 
+    std::vector<double>  steps;
+    std::vector<double>  deltas;
+    std::vector<BaseArrayDouble> barrays;
+
+    ArrayDouble s_iterate = iterate;
+
     ulong start_t = t;
     for (t = start_t; t < start_t + epoch_size; ++t) {
         ulong i = get_next_i();
-        // Sparse features vector
-        BaseArrayDouble x_i = model->get_features(i);
-        // Gradient factor
-        double alpha_i = model->grad_i_factor(i, iterate);
-        // Update the step
-        double step_t = get_step_t();
-        double delta = -step_t * alpha_i;
+        steps.emplace_back(get_step_t());
+        deltas.emplace_back(-step_t * model->grad_i_factor(i, iterate));
+        // barrays.emplace_back(model->get_features(i));
+        barrays.emplace_back(model->get_features(i));
         if (use_intercept) {
-            // Get the features vector, which is sparse here
-            ArrayDouble iterate_no_interc = view(iterate, 0, n_features);
-            iterate_no_interc.mult_incr(x_i, delta);
-            iterate[n_features] += delta;
-        } else {
-            // Stochastic gradient descent step
-            iterate.mult_incr(x_i, delta);
+          s_iterate = view(iterate, 0, n_features);
+          iterate[n_features] += deltas[deltas.size() - 1];
         }
-        // Apply the prox. No lazy-updating here yet
-        prox->call(iterate, step_t, iterate);
     }
+    for (const auto& barray : barrays) {
+        std::cout << "SIZE: " << barray.size() << std::endl;
+    }
+
+    std::vector<double*> barraysVP;
+    for(const auto& barray : barrays){
+      barraysVP.emplace_back(barray.data());
+    }
+    tick::vector_operations<double>{}.batch_multi_incr(
+      steps.size(), barrays[0].size(), deltas.data(), barraysVP.data(), s_iterate.data()
+    );
+
+    for (const auto& step : steps) {
+        prox->call(iterate, step, iterate);
+    }
+
+    // ulong start_t = t;
+    // for (t = start_t; t < start_t + epoch_size; ++t) {
+    //     ulong i = get_next_i();
+    //     // Sparse features vector
+    //     BaseArrayDouble x_i = model->get_features(i);
+    //     // Gradient factor
+    //     double alpha_i = model->grad_i_factor(i, iterate);
+    //     // Update the step
+    //     double step_t = get_step_t();
+    //     double delta = -step_t * alpha_i;
+    //     if (use_intercept) {
+    //         // Get the features vector, which is sparse here
+    //         ArrayDouble iterate_no_interc = view(iterate, 0, n_features);
+    //         iterate_no_interc.mult_incr(x_i, delta);
+    //         iterate[n_features] += delta;
+    //     } else {
+    //         // Stochastic gradient descent step
+    //         iterate.mult_incr(x_i, delta);
+    //     }
+    //     // Apply the prox. No lazy-updating here yet
+    //     prox->call(iterate, step_t, iterate);
+    // }
 }
 
 inline double SGD::get_step_t() {

@@ -66,13 +66,16 @@ if [[ "$unameOut" == "Darwin"* ]]; then
   done
 fi
 
+RUN="run"
+[[ $DEBUG == 1 ]] && RUN="dbg"
+
 for FILE in "${FILES[@]}"; do
 
     echo FILE $FILE
 
-    mkn clean build run -p gtest -a "${CARGS}" \
+    mkn clean build -p gtest -a "${CARGS}" \
         -tl "${LDARGS} ${LIB}" -b "$PY_INCS" \
         -M "${FILE}" -P "${MKN_P}" \
-        -B $B_PATH
+        -B $B_PATH ${RUN}
         
 done

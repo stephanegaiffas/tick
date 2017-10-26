@@ -1,0 +1,20 @@
+
+local:
+    repo: /opt/mkn
+
+path: /opt/intel/lib/intel64
+
+env:
+ - name: PATH
+   mode: prepend
+   value: /opt/intel/bin
+
+file:
+  - type: c
+    archiver: ar -cr
+    compiler: icc
+    linker: icc
+  - type: cpp:cxx:cc
+    archiver: ar -cr
+    compiler: icpc
+    linker: icpc -Wl,rpath,/opt/intel/lib/intel64

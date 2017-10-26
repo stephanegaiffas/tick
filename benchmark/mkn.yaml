@@ -1,0 +1,12 @@
+#! clean
+
+name: mallocs
+
+dep:
+  - name: google.perf
+    version: master
+    scm: https://github.com/mkn-nix/google.perf
+  - name: mem.jemalloc
+    version: master
+    scm: https://github.com/mkn-nix/mem.jemalloc
+

@@ -45,7 +45,7 @@ MKN_C_FLAGS=" $TICK_INDICES "
 source $ROOT/sh/swig.sh
 
 for P in "${PROFILES[@]}"; do 
-    mkn compile -ta "${MKN_C_FLAGS[@]}" -b "$PY_INCS" -p ${P} 
+  mkn compile -ta "${MKN_C_FLAGS[@]}" -b "$PY_INCS" ${MKN_X_FILE[@]} -p ${P}
 done
 
 TKLOG=$KLOG
@@ -58,14 +58,14 @@ for P in "${PROFILES[@]}"; do
       KLOG=0 
       OUT=$(mkn link -p $P -l "${LDARGS} $LIBLD" \
             -P lib_name=$LIB_POSTFIX \
-            -RB $B_PATH |  head -1)
+            ${MKN_X_FILE[@]} -RB $B_PATH |  head -1)
       OUT=$(echo $OUT | sed -e "s/.dll/.pyd/g")
       (( TKLOG > 0 )) && echo $OUT
       cmd /c "${OUT[@]}"
     else
       mkn link -p $P -l "${LIBLDARGS} ${LDARGS} $LIBLD" \
          -P "${MKN_P}" \
-         -B "$B_PATH"
+         ${MKN_X_FILE[@]} -B "$B_PATH"
     fi
     PUSHD=${LIBRARIES[$EX]}
     pushd $(dirname ${PUSHD}) 2>&1 > /dev/null

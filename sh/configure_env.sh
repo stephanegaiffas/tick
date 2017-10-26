@@ -204,6 +204,14 @@ MKN_P=${MKN_P:0:${MKN_P_SIZE}}
 #  be escaped with a single backslash (\)
 ##
 
+##
+# The mkn -x option overrides the defaul settings file 
+#  to allow to build with differernt compilres/configurations
+MKN_X="${MKN_X_FILE}"
+[ -n "${MKN_X_FILE}" ] && MKN_X_FILE=(-x $MKN_X)
+##
+
+
 PROFILES=(
     array
     base

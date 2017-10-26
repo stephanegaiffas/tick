@@ -21,7 +21,7 @@ property:
            -DNDEBUG
     win_cargs:
       -Ox -GL -DNDEBUG -MT -EHsc -DBUILDING_DLL
-    nixish_cargs: -fwrapv -O2 -Wall
+    nixish_cargs: -fwrapv -O3 -Wall -funroll-loops
                   -fstack-protector-strong 
                   -Wformat -Werror=format-security -Wdate-time 
                   -D_FORTIFY_SOURCE=2 -fPIC -std=c++11
@@ -69,6 +69,7 @@ profile:
       ./tick/base/src 
       ./tick/base/array/src
       ./tick/third_party/cereal/include
+      /opt/intel/mkl/include
     src:
       ./tick/base/array/src
       ./tick/base/array/swig
@@ -172,4 +173,12 @@ profile:
     dep:
       - name: google.test
         version: master
+
+    path: 
+      /opt/intel/mkl/lib/intel64
+
+    lib: mkl_intel_lp64 mkl_sequential mkl_core
+
+    link: 
+      -Wl,-rpath=/opt/intel/mkl/lib/intel64
 

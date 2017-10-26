@@ -1,0 +1,18 @@
+
+local:
+    repo: /opt/mkn
+
+env:
+ - name: PATH
+   mode: prepend
+   value: /opt/chain/clang5/bin
+
+file:
+  - type: c
+    archiver: ar -cr
+    compiler: clang
+    linker: clang
+  - type: cpp:cxx:cc
+    archiver: ar -cr
+    compiler: clang++
+    linker: clang++

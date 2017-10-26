@@ -1,0 +1,14 @@
+# this is the system compiler on debian 9
+
+local:
+    repo: /opt/mkn
+
+file:
+  - type: c
+    archiver: ar -cr
+    compiler: gcc
+    linker: gcc
+  - type: cpp:cxx:cc
+    archiver: ar -cr
+    compiler: g++
+    linker: g++
