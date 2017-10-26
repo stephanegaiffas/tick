@@ -70,11 +70,7 @@ class Node{
       tree->m_nodes[index].m_value = 0;
     }
 
-    bool has_parent() {
-      if(i_index == 0) return 0; 
-      return 1;
-    }
-
+    bool has_parent() { return i_index; }
     size_t left()     { return i_left;  }
     size_t right()    { return i_right; }
     size_t value()    { return m_value; }
