@@ -8,7 +8,6 @@
 class Node;
 class Tree{
   friend class Node;
-  using MapType = std::vector<uint32_t, Node>;
   private:
     size_t m_count = 0;
     std::vector<Node> m_nodes;
