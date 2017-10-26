@@ -1,0 +1,8 @@
+
+
+name: containers
+main: treevector.cpp
+
+dep:
+  - name: mkn.kul
+    version: master
